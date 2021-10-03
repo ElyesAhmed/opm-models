@@ -47,6 +47,15 @@
 #include <string>
 #include <memory>
 
+namespace Opm::Parallel { 
+using MPIComm = typename Dune::MPIHelper::MPICommunicator;  
+#if DUNE_VERSION_NEWER(DUNE_COMMON, 2, 7)
+    using Communication = Dune::Communication<MPIComm>; 
+#else
+    using Communication = Dune::CollectiveCommunication<MPIComm>;
+#endif
+} // end namespace Communication
+
 #define EWOMS_CATCH_PARALLEL_EXCEPTIONS_FATAL(code)                      \
     {                                                                   \
         const auto& comm = Dune::MPIHelper::getCollectiveCommunication(); \
@@ -93,26 +102,18 @@ class Simulator
     using Vanguard = GetPropType<TypeTag, Properties::Vanguard>;
     using GridView = GetPropType<TypeTag, Properties::GridView>;
     using Model = GetPropType<TypeTag, Properties::Model>;
-    using Problem = GetPropType<TypeTag, Properties::Problem>;
-
-    using MPIComm = typename Dune::MPIHelper::MPICommunicator;
-    #if DUNE_VERSION_NEWER(DUNE_COMMON, 2, 7)
-        using Communication = Dune::Communication<MPIComm>;
-    #else
-        using Communication = Dune::CollectiveCommunication<MPIComm>;
-    #endif
-
+    using Problem = GetPropType<TypeTag, Properties::Problem>;   
 
 public:
     // do not allow to copy simulators around
     Simulator(const Simulator& ) = delete;
 
     Simulator(bool verbose = true)
-        :Simulator(Communication(), verbose)   
+        :Simulator(Parallel::Communication(), verbose)   
     {  
     }
 
-    Simulator(Communication comm, bool verbose = true)
+    Simulator(Parallel::Communication comm, bool verbose = true)
     {
         TimerGuard setupTimerGuard(setupTimer_);
 
