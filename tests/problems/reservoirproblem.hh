@@ -42,6 +42,11 @@
 #include <dune/grid/yaspgrid.hh>
 #include <dune/grid/io/file/dgfparser/dgfyasp.hh>
 
+#if HAVE_DUNE_ALUGRID
+#include <dune/alugrid/grid.hh>
+#include <dune/alugrid/dgf.hh>
+#endif
+
 #include <dune/common/version.hh>
 #include <dune/common/fvector.hh>
 #include <dune/common/fmatrix.hh>
@@ -76,7 +81,11 @@ struct WellWidth { using type = UndefinedProperty; };
 
 // Set the grid type
 template<class TypeTag>
-struct Grid<TypeTag, TTag::ReservoirBaseProblem> { using type = Dune::YaspGrid<2>; };
+//struct Grid<TypeTag, TTag::ReservoirBaseProblem> { using type = Dune::YaspGrid<2>; };
+struct Grid<TypeTag, TTag::ReservoirBaseProblem> { using type = Dune::ALUGrid</*dim=*/2,
+                            /*dimWorld=*/2,
+                            Dune::cube,
+              Dune::nonconforming>; };
 
 // Set the problem property
 template<class TypeTag>

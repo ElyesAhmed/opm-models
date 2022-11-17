@@ -82,8 +82,11 @@ struct Problem<TypeTag, TTag::LensBaseProblem> { using type = Opm::LensProblem<T
 
 // Use Dune-grid's YaspGrid
 template<class TypeTag>
-struct Grid<TypeTag, TTag::LensBaseProblem> { using type = Dune::YaspGrid<2>; };
-
+//struct Grid<TypeTag, TTag::LensBaseProblem> { using type = Dune::YaspGrid<2>; };
+struct Grid<TypeTag, TTag::LensBaseProblem> { using type = Dune::ALUGrid</*dim=*/2,
+                            /*dimWorld=*/2,
+                            Dune::cube,
+              Dune::nonconforming>; };
 // Set the wetting phase
 template<class TypeTag>
 struct WettingPhase<TypeTag, TTag::LensBaseProblem>

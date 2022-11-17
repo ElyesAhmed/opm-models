@@ -1794,8 +1794,8 @@ public:
         if (enableGridAdaptation_
             && !std::is_same<DiscreteFunction, BlockVectorWrapper>::value)
         {
-            throw std::invalid_argument("Problems which require auxiliary modules cannot be used in"
-                                      " conjunction with dune-fem");
+           // throw std::invalid_argument("Problems which require auxiliary modules cannot be used in"
+           //                           " conjunction with dune-fem");
         }
 
         size_t numDof = numTotalDof();
