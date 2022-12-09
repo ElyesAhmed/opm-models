@@ -42,7 +42,7 @@ namespace Opm {
 /*!
  * \ingroup FiniteVolumeDiscretizations
  *
- * \brief This class stores an array of IntensiveQuantities objects, one
+ * \brief This class stmaryores an array of IntensiveQuantities objects, one
  *        intensive quantities object for each of the element's vertices
  */
 template<class TypeTag>

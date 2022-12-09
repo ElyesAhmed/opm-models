@@ -164,7 +164,7 @@ public:
         ParentType::update(elemCtx, dofIdx, timeIdx);
 
         const auto& problem = elemCtx.problem();
-        const auto& priVars = elemCtx.primaryVars(dofIdx, timeIdx);
+        auto& priVars = elemCtx.primaryVars(dofIdx, timeIdx);
         const auto& linearizationType = problem.model().linearizer().getLinearizationType();
         unsigned globalSpaceIdx = elemCtx.globalSpaceIndex(dofIdx, timeIdx);
         Scalar RvMax = FluidSystem::enableVaporizedOil()
@@ -213,7 +213,7 @@ public:
                  Sg = 1.0;
             } else
             {
-                assert(priVars.primaryVarsMeaning() == PrimaryVariables::Sw_po_Rs);
+               // assert(priVars.primaryVarsMeaning() == PrimaryVariables::Sw_po_Rs);
                 // -> oil-water case
                 Sg = 0.0;
             }
@@ -249,7 +249,7 @@ public:
         problem.updateRelperms(mobility_, dirMob_, fluidState_, globalSpaceIdx);
 
         // oil is the reference phase for pressure
-        if (priVars.primaryVarsMeaning() == PrimaryVariables::Sw_pg_Rv || priVars.primaryVarsMeaning() == PrimaryVariables::Rvw_pg_Rv) {
+        if (compositionSwitchEnabled && priVars.primaryVarsMeaning() == PrimaryVariables::Sw_pg_Rv || priVars.primaryVarsMeaning() == PrimaryVariables::Rvw_pg_Rv) {
             const Evaluation& pg = priVars.makeEvaluation(Indices::pressureSwitchIdx, timeIdx);
             for (unsigned phaseIdx = 0; phaseIdx < numPhases; ++phaseIdx)
                 if (FluidSystem::phaseIsActive(phaseIdx))
@@ -277,7 +277,10 @@ public:
 
         // take the meaning of the switching primary variable into account for the gas
         // and oil phase compositions
-        if (priVars.primaryVarsMeaning() == PrimaryVariables::Sw_po_Sg) {
+        if (!compositionSwitchEnabled){
+           //do nothing
+        }
+        else if (priVars.primaryVarsMeaning() == PrimaryVariables::Sw_po_Sg) {
             // in the threephase case, gas and oil phases are potentially present, i.e.,
             // we use the compositions of the gas-saturated oil and oil-saturated gas.
             if (FluidSystem::enableDissolvedGas()) {
@@ -411,7 +414,7 @@ public:
                 fluidState_.setRvw(RvwSat);
             }
         } else {
-            assert(priVars.primaryVarsMeaning() == PrimaryVariables::OnePhase_p);
+          //  assert(priVars.primaryVarsMeaning() == PrimaryVariables::OnePhase_p);
         }
 
         typename FluidSystem::template ParameterCache<Evaluation> paramCache;

@@ -131,6 +131,7 @@ public:
         Rvw_po_Sg, // gas + oil  case
         Rvw_pg_Rv, //gas only
         OnePhase_p, // onephase case
+        Undef, //
     };
 
     enum PrimaryVarsMeaningBrine {
@@ -142,6 +143,7 @@ public:
         : ParentType()
     {
         Valgrind::SetUndefined(*this);
+        setPrimaryVarsMeaning(Undef);
         pvtRegionIdx_ = 0;
     }
 
@@ -152,6 +154,7 @@ public:
         : ParentType(value)
     {
         Valgrind::SetUndefined(primaryVarsMeaning_);
+        setPrimaryVarsMeaning(Undef);
         pvtRegionIdx_ = 0;
     }
 
@@ -447,6 +450,9 @@ public:
         // required to be able to decide if the primary variables needs to be switched or
         // not, so it would be a waste to compute them.
         if (primaryVarsMeaning() == OnePhase_p){
+            return false;
+        }
+        if (!compositionSwitchEnabled){
             return false;
         }
         Scalar Sw = 0.0;
@@ -940,6 +946,8 @@ public:
     {
         for (unsigned i = 0; i < numEq; ++i)
             (*this)[i] = value;
+       
+        setPrimaryVarsMeaning(Undef);
 
         return *this;
     }
