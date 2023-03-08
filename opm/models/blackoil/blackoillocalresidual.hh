@@ -197,12 +197,22 @@ public:
             unsigned upIdx = static_cast<unsigned>(extQuants.upstreamIndex(phaseIdx));
             const IntensiveQuantities& up = elemCtx.intensiveQuantities(upIdx, timeIdx);
             unsigned pvtRegionIdx = up.pvtRegionIndex();
-            if (upIdx == focusDofIdx)
+            if (upIdx == focusDofIdx) {
                 evalPhaseFluxes_<Evaluation>(flux, phaseIdx, pvtRegionIdx, extQuants, up.fluidState());
-            else
+                for (unsigned eqIdx = 0; eqIdx < numEq; ++eqIdx) {        
+                    if(!isfinite(flux[eqIdx]))
+                      int failure = 125;
+                }
+            }    
+            else {
                 evalPhaseFluxes_<Scalar>(flux, phaseIdx, pvtRegionIdx, extQuants, up.fluidState());
+                for (unsigned eqIdx = 0; eqIdx < numEq; ++eqIdx) {        
+                    if(!isfinite(flux[eqIdx]))
+                      int failure = 125;
+                }
+            }    
         }
-
+       
         // deal with solvents (if present)
         SolventModule::computeFlux(flux, elemCtx, scvfIdx, timeIdx);
 
@@ -266,6 +276,11 @@ public:
         else
             flux[conti0EqIdx + activeCompIdx] += surfaceVolumeFlux*FluidSystem::referenceDensity(phaseIdx, pvtRegionIdx);
 
+
+        for (unsigned eqIdx = 0; eqIdx < numEq; ++eqIdx) {        
+                    if(!isfinite(flux[eqIdx]))
+                      int failure = 125;
+        }
         if (phaseIdx == oilPhaseIdx) {
             // dissolved gas (in the oil phase).
             if (FluidSystem::enableDissolvedGas()) {

@@ -147,9 +147,9 @@ public:
             // adaptivity because the async-IO code assumes that the grid stays
             // constant. complain about that case.
             bool enableGridAdaptation = EWOMS_GET_PARAM(TypeTag, bool, EnableGridAdaptation);
-            if (asyncVtkOutput && enableGridAdaptation)
-                throw std::runtime_error("Asynchronous VTK output currently cannot be used "
-                                         "at the same time as grid adaptivity");
+            //if (asyncVtkOutput && enableGridAdaptation)
+            //    throw std::runtime_error("Asynchronous VTK output currently cannot be used "
+            //                             "at the same time as grid adaptivity");
 
             std::string outputDir = asImp_().outputDir();
 

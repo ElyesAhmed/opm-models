@@ -586,6 +586,7 @@ protected:
                 tmp[eqIdx] *= scvVolume / dt;
 
                 residual[dofIdx][eqIdx] += tmp[eqIdx];
+                assert(isfinite(residual[dofIdx][eqIdx]));
             }
 
             Valgrind::CheckDefined(residual[dofIdx]);
@@ -600,13 +601,15 @@ protected:
                 !std::is_same<Scalar, Evaluation>::value &&
                 dofIdx != elemCtx.focusDofIndex())
             {
-                for (unsigned eqIdx = 0; eqIdx < numEq; ++eqIdx)
+                for (unsigned eqIdx = 0; eqIdx < numEq; ++eqIdx){
                     residual[dofIdx][eqIdx] -= scalarValue(sourceRate[eqIdx])*scvVolume;
+                    assert(isfinite(residual[dofIdx][eqIdx]));}
             }
             else {
                 for (unsigned eqIdx = 0; eqIdx < numEq; ++eqIdx) {
                     sourceRate[eqIdx] *= scvVolume;
                     residual[dofIdx][eqIdx] -= sourceRate[eqIdx];
+                    assert(isfinite(residual[dofIdx][eqIdx])); 
                 }
             }
 

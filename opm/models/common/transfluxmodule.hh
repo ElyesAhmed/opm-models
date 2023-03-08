@@ -36,7 +36,7 @@
 #include <opm/material/common/Valgrind.hpp>
 #include <dune/common/fvector.hh>
 #include <dune/common/fmatrix.hh>
-
+#include "multiphasebaseproblem.hh"
 namespace Opm {
 
 template <class TypeTag>
@@ -116,7 +116,6 @@ public:
     {
         throw std::logic_error("The ECL transmissibility module does not provide an explicit intrinsic permeability");
     }
-
     /*!
      * \brief Return the pressure potential gradient of a fluid phase at the
      *        face's integration point [Pa/m]
@@ -437,6 +436,8 @@ private:
         Scalar distSquaredExt = distVec1 * distVec1;
         const auto& K0mat = elemCtx.problem().intrinsicPermeability(elemCtx, face.interiorIndex(), timeIdx);
         const auto& K1mat = elemCtx.problem().intrinsicPermeability(elemCtx, face.exteriorIndex(), timeIdx);
+        //const auto& K0mat = intrinsicPermeability();
+        //const auto& K1mat = intrinsicPermeability();
         // the permeability per definition aligns with the grid
         // we only support diagonal permeability tensor
         // and can therefore neglect off-diagonal values
@@ -452,7 +453,16 @@ private:
         const Scalar& K1 = K1mat[idx][idx];
         const Scalar T0 = K0 * ndotDistIn / distSquaredIn;
         const Scalar T1 = K1 * ndotDistExt / distSquaredExt;
+        if(!isfinite(T0 * T1 / (T0 + T1))) {
+            int erro = 0.0001;
+        }
+        
+        if(!(T0 * T1 / (T0 + T1))>0) {
+            int erro = 0.0001;
+        }
+
         return T0 * T1 / (T0 + T1);
+            
     }
     Scalar transmissibilityBoundary_(const ElementContext& elemCtx, unsigned scvfIdx, unsigned timeIdx) const
     {
